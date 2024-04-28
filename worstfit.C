@@ -1,20 +1,21 @@
 #include <stdio.h>
-#include <conio.h>
+#include <stdbool.h>
 
 #define MAX_BLOCKS 10
 
-void worstFit(int blocks[], int m, int processes[], int n) {
+void worstFit(int blocks[], bool used[], int m, int processes[], int n) {
     int allocation[100];
     int i;
-    int worst_fit_index=-1;
+    int worst_fit_index;
     int j;
     for (i = 0; i < n; i++) {
         // Initialize allocation for process i as -1 (indicating unallocated)
         allocation[i] = -1;
 
-	// Find the worst fit block for current process
-	for (j = 0; j < m; j++) {
-            if (blocks[j] >= processes[i]) {
+        // Find the worst fit block for current process
+        worst_fit_index = -1; // Reset worst_fit_index for each process
+        for (j = 0; j < m; j++) {
+            if (!used[j] && blocks[j] >= processes[i]) {
                 if (worst_fit_index == -1 || blocks[j] > blocks[worst_fit_index]) {
                     worst_fit_index = j;
                 }
@@ -25,6 +26,7 @@ void worstFit(int blocks[], int m, int processes[], int n) {
         if (worst_fit_index != -1) {
             allocation[i] = worst_fit_index;
             blocks[worst_fit_index] -= processes[i];
+            used[worst_fit_index] = true; // Mark the block as used
         }
     }
 
@@ -42,6 +44,7 @@ void worstFit(int blocks[], int m, int processes[], int n) {
 
 int main() {
     int blocks[MAX_BLOCKS], processes[MAX_BLOCKS];
+    bool used[MAX_BLOCKS] = {false}; // Array to keep track of used blocks
     int m, n;
     int i;
     // Input the number of memory blocks
@@ -51,7 +54,7 @@ int main() {
     // Input the sizes of memory blocks
     printf("Enter the sizes of memory blocks:\n");
     for (i = 0; i < m; i++) {
-	scanf("%d", &blocks[i]);
+        scanf("%d", &blocks[i]);
     }
 
     // Input the number of processes
@@ -61,12 +64,12 @@ int main() {
     // Input the sizes of processes
     printf("Enter the sizes of processes:\n");
     for (i = 0; i < n; i++) {
-	scanf("%d", &processes[i]);
+        scanf("%d", &processes[i]);
     }
 
     // Call the worst fit memory allocation function
-    worstFit(blocks, m, processes, n);
+    worstFit(blocks, used, m, processes, n);
 
-    getch(); // Waits for a key press before exiting
+    // Waits for a key press before exiting
     return 0;
 }
